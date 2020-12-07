@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
+  ScrollView,
   Text,
   Platform,
   Image,
@@ -11,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 
 const App = () => {
   //image is a state used to store the selected image. setImage is use to update image
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]);
   //function to request permission from the camera roll to access pictures
   const requestCameraRollPermission = async () => {
     if (Platform.OS !== "web") {
@@ -28,7 +29,7 @@ const App = () => {
       aspect: [4, 3],
       quality: 1,
     });
-    if (!result.cancelled) setImage(result.uri);
+    if (!result.cancelled) setImages([...images, result.uri]);
   };
   //lifecycle methods to call the request permission function
   useEffect(() => {
@@ -36,9 +37,15 @@ const App = () => {
   }, []);
   return (
     <View style={styles.container}>
-      {image && (
-        <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />
-      )}
+      <ScrollView horizontal={true}>
+        {images.map((image, index) => (
+          <Image
+            key={index}
+            source={{ uri: image }}
+            style={{ width: 100, height: 100 }}
+          />
+        ))}
+      </ScrollView>
       <CustomButton selectImage={selectImage} />
       {/* use the customly made button while passing selectImage function as prop */}
     </View>
@@ -77,5 +84,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     textTransform: "uppercase",
+  },
+  images: {
+    margin: 2,
   },
 });
